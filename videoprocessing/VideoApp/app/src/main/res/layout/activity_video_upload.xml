@@ -76,4 +76,17 @@
         android:layout_height="wrap_content"
         android:max="100" />
 
+    <Button
+        android:id="@+id/to_playvideo_page"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:layout_marginLeft="100dp"
+        android:layout_marginRight="100dp"
+        android:layout_marginTop="40dp"
+        android:background="@color/colorAccent"
+        android:text="播放页"
+        android:textStyle="bold"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"/>
+
 </LinearLayout>

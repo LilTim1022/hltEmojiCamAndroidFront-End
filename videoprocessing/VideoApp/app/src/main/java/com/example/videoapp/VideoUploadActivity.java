@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -40,6 +41,7 @@ public class VideoUploadActivity extends AppCompatActivity {
     private String path = "";//文件路径
     private ProgressBar post_progress;
     private TextView post_text;
+    Button to_playvideo_Btn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +54,8 @@ public class VideoUploadActivity extends AppCompatActivity {
         final EditText video_name = (EditText)findViewById(R.id.upload_video_name);
         post_progress = (ProgressBar) findViewById(R.id.post_progress);
         post_text = (TextView) findViewById(R.id.post_text);
+        to_playvideo_Btn = findViewById(R.id.to_playvideo_page);
+
         //设置选择视频的onclick
         findViewById(R.id.video_select).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -115,6 +119,29 @@ public class VideoUploadActivity extends AppCompatActivity {
             }
         });
 
+        to_playvideo_Btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    //disable overlay button after click
+//                    playBtn.setClickable(false);
+                    // change overlay button test after click
+//                    playBtn.setText("FindingVideo..");
+                    // change the flag as tag in overlay button to API call for sensor event change
+//                    playBtn.setTag("d");
+//                    StringEntity entity = new StringEntity("");
+
+                    // A REST API POST call to insert an overlay inside the video
+//                   playVideo("getOverlayVideo");
+//                   playBtn.setText("Play Overlay Video");
+                     Intent intent=new Intent(VideoUploadActivity.this,MainActivity.class);
+                     startActivity(intent);
+                } catch (Exception e) {
+                    // TOAST to show the message to the user
+                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            }
+        });
     }
 
     @Override
