@@ -23,7 +23,8 @@ public class HttpUtil {
         builder.setType(MultipartBody.FORM);
         Log.i("huang","files[0].getName()=="+files[0].getName());
         //第一个参数要与Servlet中的一致
-        builder.addFormDataPart("myfile",files[0].getName(), RequestBody.create(MediaType.parse("application/octet-stream"),files[0]));
+        //builder.addFormDataPart("myfile",files[0].getName(), RequestBody.create(MediaType.parse("application/octet-stream"),files[0]));
+        builder.addFormDataPart("myfile",files[0].getName(), RequestBody.create(MediaType.parse("multipart/form-data"),files[0]));
 
         MultipartBody multipartBody = builder.build();
 

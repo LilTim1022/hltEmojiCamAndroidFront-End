@@ -1,9 +1,11 @@
 package com.example.videoapp;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -19,6 +21,7 @@ import android.widget.Toast;
 
 //import com.example.util;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.example.util.HttpUtil;
 import com.example.util.ProgressListener;
@@ -61,11 +64,27 @@ public class VideoUploadActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 //                Toast.makeText(VideoUploadActivity.this, "路径："+basePath, Toast.LENGTH_LONG).show();
+                //(Permission denied) 没有文件的读写权限  你要获取手机的权限 好的
+                //运行起来了吗 可以 点击了上传 是debug运行的吧 怎么没有进入点击的断点 现在是，稍等 刚刚是运行好的 你手机和电脑是一个局域网吗 是的，我播放视频是用assynchttp，都可以 ip都不是一个 我改过了，也是一样的结果的 flask那里我也改一下，也是不行的
+                //这样吧 我在  注册了了读写权限  等会安装app后 你进入app的权限管理开启那两个权限  然后再上传试一下 收到 弄了和我说一下 好 手机打开的这个软件的权限不 开了 设置里面开了 点 点 开软件读写权限 我截图发咸鱼你看一下 可以了，试一下不用断点
+                //ok了老哥 android:requestLegacyExternalStorage="true" android10(compileSdkVersion 29)强制文件要走沙盒路径了
+                //如果没有android:requestLegacyExternalStorage="true"这个  需要把文件拷贝到沙盒里面 这个你要看一下android文件适配
+
+                //下面这两个权限你可以百度一下  改一下逻辑  在想要触发的什么向用户申请权限  基本就可以了 OK 其他没问题了吧 嗯嗯  那我退了
+
+               if (ContextCompat.checkSelfPermission(VideoUploadActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                   Log.i(TAG, "has READ_EXTERNAL_STORAGE Permission");
+               }
+
+               if (ContextCompat.checkSelfPermission(VideoUploadActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                   Log.i(TAG, "has WRITE_EXTERNAL_STORAGE Permission");
+               }
+
                 if(path.equals(""))
                     Toast.makeText(VideoUploadActivity.this, "请选择视频后，再点击上传！", Toast.LENGTH_LONG).show();
                 else {
                     File file = new File( path);
-                    String postUrl = "http://127.0.0.1:5000/api/upload";
+                    String postUrl = "http://10.242.229.207:5000/api/upload";
 
                     HttpUtil.postFile(postUrl, new ProgressListener() {
                         @Override
@@ -78,11 +97,12 @@ public class VideoUploadActivity extends AppCompatActivity {
                     }, new Callback() {
                         @Override
                         public void onFailure(Call call, IOException e) {
-
+                            Log.i(TAG, "onFailure==" + e.getMessage());
                         }
 
                         @Override
                         public void onResponse(Call call, Response response) throws IOException {
+                            Log.i(TAG, "onResponse");
                             if (response != null) {
                                 String result = response.body().string();
                                 Log.i(TAG, "result===" + result);
