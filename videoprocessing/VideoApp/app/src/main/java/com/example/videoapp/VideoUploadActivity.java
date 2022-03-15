@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 //import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -28,6 +29,8 @@ import com.example.util.HttpUtil;
 import com.example.util.ProgressListener;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.net.URI;
 import java.io.IOException;
 
@@ -42,6 +45,10 @@ public class VideoUploadActivity extends AppCompatActivity {
     private ProgressBar post_progress;
     private TextView post_text;
     Button to_playvideo_Btn;
+    Button download_vid_Btn;
+
+    //下载目录定义
+    public static String basePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/okhttp";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +62,8 @@ public class VideoUploadActivity extends AppCompatActivity {
         post_progress = (ProgressBar) findViewById(R.id.post_progress);
         post_text = (TextView) findViewById(R.id.post_text);
         to_playvideo_Btn = findViewById(R.id.to_playvideo_page);
+        download_vid_Btn = findViewById(R.id.video_download);
+
 
         //设置选择视频的onclick
         findViewById(R.id.video_select).setOnClickListener(new View.OnClickListener() {
@@ -68,13 +77,12 @@ public class VideoUploadActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 //                Toast.makeText(VideoUploadActivity.this, "路径："+basePath, Toast.LENGTH_LONG).show();
-                //(Permission denied) 没有文件的读写权限  你要获取手机的权限 好的
-                //运行起来了吗 可以 点击了上传 是debug运行的吧 怎么没有进入点击的断点 现在是，稍等 刚刚是运行好的 你手机和电脑是一个局域网吗 是的，我播放视频是用assynchttp，都可以 ip都不是一个 我改过了，也是一样的结果的 flask那里我也改一下，也是不行的
+                //(Permission denied) 没有文件的读写权限
                 //这样吧 我在  注册了了读写权限  等会安装app后 你进入app的权限管理开启那两个权限  然后再上传试一下 收到 弄了和我说一下 好 手机打开的这个软件的权限不 开了 设置里面开了 点 点 开软件读写权限 我截图发咸鱼你看一下 可以了，试一下不用断点
                 //ok了老哥 android:requestLegacyExternalStorage="true" android10(compileSdkVersion 29)强制文件要走沙盒路径了
                 //如果没有android:requestLegacyExternalStorage="true"这个  需要把文件拷贝到沙盒里面 这个你要看一下android文件适配
 
-                //下面这两个权限你可以百度一下  改一下逻辑  在想要触发的什么向用户申请权限  基本就可以了 OK 其他没问题了吧 嗯嗯  那我退了
+                //下面这两个权限你可以百度一下  改一下逻辑  在想要触发的什么向用户申请权限
 
                if (ContextCompat.checkSelfPermission(VideoUploadActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                    Log.i(TAG, "has READ_EXTERNAL_STORAGE Permission");
@@ -123,23 +131,63 @@ public class VideoUploadActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 try {
-                    //disable overlay button after click
-//                    playBtn.setClickable(false);
-                    // change overlay button test after click
-//                    playBtn.setText("FindingVideo..");
-                    // change the flag as tag in overlay button to API call for sensor event change
-//                    playBtn.setTag("d");
-//                    StringEntity entity = new StringEntity("");
-
-                    // A REST API POST call to insert an overlay inside the video
-//                   playVideo("getOverlayVideo");
-//                   playBtn.setText("Play Overlay Video");
                      Intent intent=new Intent(VideoUploadActivity.this,MainActivity.class);
                      startActivity(intent);
                 } catch (Exception e) {
                     // TOAST to show the message to the user
                     Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
                 }
+            }
+        });
+
+        download_vid_Btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String url = "http://10.242.229.207:5000/videos/processed.mp4";
+//                final String fileName = url.split("/")[url.split("/").length - 1];
+                final String fileName ="processed.mp4";
+                Log.i(TAG, "fileName==" + fileName);
+
+                 if (ContextCompat.checkSelfPermission(VideoUploadActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                   Log.i(TAG, "has READ_EXTERNAL_STORAGE Permission");
+               }
+
+               if (ContextCompat.checkSelfPermission(VideoUploadActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                   Log.i(TAG, "has WRITE_EXTERNAL_STORAGE Permission");
+               }
+
+
+                HttpUtil.downloadFile(url, new ProgressListener() {
+                    @Override
+                    public void onProgress(long currentBytes, long contentLength, boolean done) {
+                        Log.i(TAG, "currentBytes==" + currentBytes + "==contentLength==" + contentLength + "==done==" + done);
+                        int progress = (int) (currentBytes * 100 / contentLength);
+                        post_progress.setProgress(progress);
+                        post_text.setText(progress + "%");
+                    }
+                }, new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+
+                    }
+
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        if (response != null) {
+                            InputStream is = response.body().byteStream();
+                            FileOutputStream fos = new FileOutputStream(new File(basePath + "/" + fileName));
+                            int len = 0;
+                            byte[] buffer = new byte[2048];
+                            while (-1 != (len = is.read(buffer))) {
+                                fos.write(buffer, 0, len);
+                            }
+                            fos.flush();
+                            fos.close();
+                            is.close();
+                        }
+                    }
+                });
             }
         });
     }
