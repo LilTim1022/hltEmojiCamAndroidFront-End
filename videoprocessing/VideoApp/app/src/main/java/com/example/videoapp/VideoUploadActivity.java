@@ -96,7 +96,7 @@ public class VideoUploadActivity extends AppCompatActivity {
                     Toast.makeText(VideoUploadActivity.this, "请选择视频后，再点击上传！", Toast.LENGTH_LONG).show();
                 else {
                     File file = new File( path);
-                    String postUrl = "http://10.242.229.207:5000/api/upload";
+                    String postUrl = "http://10.242.210.105:5000/api/upload";
 
                     HttpUtil.postFile(postUrl, new ProgressListener() {
                         @Override

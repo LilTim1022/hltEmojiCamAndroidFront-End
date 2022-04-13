@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+
+    >
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -28,7 +29,7 @@
             android:id="@+id/overlayBtn"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="Insert Overlay"
+            android:text="一键换脸"
             android:background="@color/colorPrimary"
             android:padding="10dp"
             />
@@ -37,34 +38,38 @@
             android:id="@+id/playBtn"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="Play Overlayed Video"
+            android:text="播放处理后视频"
             android:background="@color/colorPrimary"
             android:padding="10dp"
             />
+
         <Button
-            android:id="@+id/selectVidBtn"
+            android:id="@+id/FERBtn"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="Select Video To Upload"
+            android:text="生成表情识别视频"
             android:background="@color/colorPrimary"
             android:padding="10dp"
             />
+
+        <Button
+            android:id="@+id/play_FER_Btn"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="播放表情识别视频"
+            android:background="@color/colorPrimary"
+            android:padding="10dp"
+            />
+
         <Button
             android:id="@+id/uploadBtn"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="Upload"
+            android:text="上传页面"
             android:background="@color/colorPrimary"
             android:padding="10dp"
             />
-         <Button
-            android:id="@+id/to_uploadpage_Btn"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="To Upload Page"
-            android:background="@color/colorPrimary"
-            android:padding="10dp"
-            />
+
     </LinearLayout>
 
 </LinearLayout>

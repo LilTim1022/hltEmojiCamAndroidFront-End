@@ -34,12 +34,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     String[] direction = {"NONE", "NONE"}; // Declared directions Array
     Button overlayBtn;
     Button playBtn;
-    Button selectVidBtn;
+    Button FERBtn;
     Button uploadBtn;
-    Button upload_pageBtn;
+    Button playFERBtn;
     SensorManager manager; // Declared a sensor manager
     Sensor accelerometer; // Declared a Sensor
-    String apiBaseUrl = "http://10.242.229.207:5002/"; // sample REST api base url where Python flask API run
+    String apiBaseUrl = "http://10.242.210.105:5002/"; // sample REST api base url where Python flask API run
 
 
     @Override
@@ -50,9 +50,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         playVideo("getVideo");
         playBtn = (Button) findViewById(R.id.playBtn);
         overlayBtn = (Button) findViewById(R.id.overlayBtn);
-        selectVidBtn = (Button) findViewById(R.id.selectVidBtn);
         uploadBtn = (Button) findViewById(R.id.uploadBtn);
-        upload_pageBtn = (Button) findViewById(R.id.to_uploadpage_Btn);
+        FERBtn = findViewById(R.id.FERBtn);
+        playFERBtn = findViewById(R.id.play_FER_Btn);
+
         // add a flag as tag in overlay button to avoid initial API call for sensor event change
         overlayBtn.setTag("m");
 
@@ -108,6 +109,58 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
         });
 
+        //FER处理按钮
+        FERBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    //disable overlay button after click
+                    overlayBtn.setClickable(false);
+                    // change overlay button test after click
+                    overlayBtn.setText("Processing..");
+                    // change the flag as tag in overlay button to API call for sensor event change
+                    overlayBtn.setTag("d");
+                    StringEntity entity = new StringEntity("");
+
+                    // A REST API POST call to insert an overlay inside the video
+                    asyncHttpClient.post(v.getContext(), apiBaseUrl + "insertFER", entity, "application/json",
+                            new JsonHttpResponseHandler() {
+                                @Override
+                                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                    try {
+                                        // enable overlay button after API response
+                                        overlayBtn.setClickable(true);
+                                        overlayBtn.setText("Insert Overlay");
+                                        String videoUrl = response.getString("overlayUrl");
+                                        playVideo(videoUrl);
+                                    } catch (JSONException e) {
+                                        // TOAST to show the message to the user
+                                        Toast.makeText(getApplicationContext(), "" + e.getMessage(), Toast.LENGTH_LONG).show();
+                                        // enable overlay button after API response
+                                        overlayBtn.setClickable(true);
+                                        overlayBtn.setText("Insert Overlay");
+                                        overlayBtn.setTag("m");
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject response) {
+                                    // enable overlay button after API response
+                                    overlayBtn.setClickable(true);
+                                    overlayBtn.setText("Insert Overlay");
+                                    overlayBtn.setTag("m");
+                                    // TOAST to show the message to the user
+                                    Toast.makeText(getApplicationContext(), "Failed to process API data.", Toast.LENGTH_LONG).show();
+                                }
+                            });
+                } catch (Exception e) {
+                    // TOAST to show the message to the user
+                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+
         //播放按钮
         playBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -130,6 +183,30 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 }
             }
         });
+
+        //播放按钮
+        playFERBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    //disable overlay button after click
+                    playFERBtn.setClickable(false);
+                    // change overlay button test after click
+                    playFERBtn.setText("FindingVideo..");
+                    // change the flag as tag in overlay button to API call for sensor event change
+                    playFERBtn.setTag("d");
+                    StringEntity entity = new StringEntity("");
+
+                    // A REST API POST call to insert an overlay inside the video
+                   playVideo("getFERVideo");
+                   playFERBtn.setText("Play Overlay Video");
+                } catch (Exception e) {
+                    // TOAST to show the message to the user
+                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
 
          uploadBtn.setOnClickListener(new View.OnClickListener() {
             @Override
